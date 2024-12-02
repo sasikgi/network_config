@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Check if script is run as root
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run this script as root"
+    exit 1
+fi
+
+# Get user input for network configuration
+read -p "Enter the interface name (e.g., eth0): " interface
+read -p "Enter the IP address: " ip_address
+read -p "Enter the subnet mask: " subnet_mask
+read -p "Enter the gateway: " gateway
+
+# Configure the network interface with the provided settings
+cat <<EOF > /etc/network/interfaces
+auto $interface
+iface $interface inet static
+    address $ip_address
+    netmask $subnet_mask
+    gateway $gateway
+EOF
+
+# Restart the network service to apply the changes
+systemctl restart networking.service
+
+echo "Network configuration applied successfully."
